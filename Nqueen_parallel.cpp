@@ -55,24 +55,37 @@ int nqueens_serial(int n)
 	find_nqueen(a, nQueens, 0, n);
 	return res;
 }
+int helper(int i, int n) {
+	vector<string> nQueens(n, string(n, '.'));
+	int res = 0;
+        int* a;
+	a = &res;
+        nQueens[0][i] = 'Q';
+	find_nqueen(a, nQueens, 1, n);
+	return res;
+}
 int main (int argc, char* argv[]) {
 	int n = -1;
 	if (argc == 2) {
 	    n = atoi (argv[1]);
 	}
-	int res = 0;
-	int sum = 0;
-#pragma omp parallel for reduction (+:sum)
+	vector<int> sum(n);
 
-	for (int i = 0; i < n; ++i) {
+int i = 0;
+int ans = 0;
+{
+#pragma omp parallel for reduction(+:ans) // shared(sum, n) private (i, res, nQueens, a)
+	for (i = 0; i < n; ++i) {
 		vector<string> nQueens(n, string(n, '.'));
 		int res = 0;
 		int* a;
 		a = &res;
-		nQueens[0][n] = 'Q';
-		find_nqueen(a, nQueens, 0, n);
-		sum += res;
-	}
-	cout << res << endl;
+		nQueens[0][i] = 'Q';
+		find_nqueen(a, nQueens, 1, n);
+		ans += res;
+        }
+}
+
+	cout << ans << endl;
 	return 0;
 }
