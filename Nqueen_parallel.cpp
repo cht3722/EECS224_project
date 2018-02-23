@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 #include <omp.h>
+#include <cstring>
+#include <cstdlib>
 using namespace std;
 
 bool isValid(vector<string> &nQueens, int row, int col, int &n)
