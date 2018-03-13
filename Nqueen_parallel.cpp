@@ -71,7 +71,7 @@ int main (int argc, char* argv[]) {
 	}
 	vector<int> sum(n);
 
-int i = 0;
+int i = 0;	
 int ans = 0;
 {
 #pragma omp parallel for reduction(+:ans) // shared(sum, n) private (i, res, nQueens, a)
@@ -83,9 +83,12 @@ int ans = 0;
 		nQueens[0][i] = 'Q';
 		find_nqueen(a, nQueens, 1, n);
 		ans += res;
+		sum[i] = res;	
         }
 }
-
+	for (int i = 0; i < n; i++) {
+		cout << i << sum[i] << endl; 
+	}	
 	cout << ans << endl;
 	return 0;
 }
