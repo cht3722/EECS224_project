@@ -55,12 +55,11 @@ int nqueens_serial(int n)
 	find_nqueen(a, nQueens, 0, n);
 	return res;
 }
-int helper(int* a, vector<string> &nQueens, int cur, int n) {
-    if (n - cur < 8) {
-        
-	find_nqueen(a, nQueens, cur, n);
-	return a[0]; 
-    }
+void helper(int* a, vector<string> &nQueens, int cur, int n) {
+    if (n - cur < 5) {
+	find_nqueen(a, nQueens, cur, n); 
+    	return;
+	}
     int ans = 0;
 #pragma omp parallel for reduction(+:ans)
 {
@@ -74,7 +73,6 @@ int helper(int* a, vector<string> &nQueens, int cur, int n) {
         new_nQueens[cur][i] = 'Q';
         if (!isValid(new_nQueens, cur, i, n)) {
             ans+=0;
-
             continue;
         }
         helper(b, new_nQueens, cur + 1, n);
@@ -83,7 +81,7 @@ int helper(int* a, vector<string> &nQueens, int cur, int n) {
     }
 }
     
-    return ans;
+    *a = ans;
 }
 int main (int argc, char* argv[]) {
 	int n = -1;
@@ -104,10 +102,10 @@ int ans = 0;
 		nQueens[0][i] = 'Q';
 		
         
-        find_nqueen(a, nQueens, 1, n);
+        helper(a, nQueens, 1, n);
 		
         
-        ans += res;
+ 	       ans += res;
 		sum[i] = res;	
         }
 }
