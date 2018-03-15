@@ -46,24 +46,6 @@ void find_nqueen(int* a, vector<string> &nQueens, int row, int &n)
 	}
 }
 
-int nqueens_serial(int n)
-{
-	int res = 0;
-	int* a;
-	a = &res;
-	vector<string> nQueens(n, string(n, '.'));
-	find_nqueen(a, nQueens, 0, n);
-	return res;
-}
-int helper(int i, int n) {
-	vector<string> nQueens(n, string(n, '.'));
-	int res = 0;
-        int* a;
-	a = &res;
-        nQueens[0][i] = 'Q';
-	find_nqueen(a, nQueens, 1, n);
-	return res;
-}
 int main (int argc, char* argv[]) {
 	int n = -1;
 	if (argc == 2) {
@@ -71,13 +53,13 @@ int main (int argc, char* argv[]) {
 	} else if (argc == 3) {
 	    n = atoi (argv[1]);
 	    int thread_num = atoi(argv[2]);
-	  	    omp_set_num_threads (thread_num);
+        omp_set_num_threads (thread_num);
 	}	
 	int thread = omp_get_max_threads();
 	vector<int> sum(thread, 0);
 
-int i = 0;	
-int ans = 0;
+    int i = 0;
+    int ans = 0;
 {
 #pragma omp parallel for reduction(+:ans) // shared(sum, n) private (i, res, nQueens, a)
 	for (i = 0; i < n; ++i) {
@@ -91,13 +73,11 @@ int ans = 0;
 		find_nqueen(a, nQueens, 1, n);
 		ans += res;
 		sum[tid] += res;	
-        }
+    }
 }
 	for (int i = 0; i < thread; i++) {
-		cout << "Thread" << i << "'s work:" << sum[i] << endl;
-
-//		cout << i << sum[i] << endl; 
-	}	
+	`	cout << "Thread" << i << "'s work:" << sum[i] << endl;
+	}
 	cout << ans << endl;
 	return 0;
 }
