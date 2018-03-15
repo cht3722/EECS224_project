@@ -68,14 +68,21 @@ int main (int argc, char* argv[]) {
 	int n = -1;
 	if (argc == 2) {
 	    n = atoi (argv[1]);
-	}
-	vector<int> sum(n);
+	} else if (argc == 3) {
+	    n = atoi (argv[1]);
+	    int thread_num = atoi(argv[2]);
+	  	    omp_set_num_threads (thread_num);
+	}	
+	int thread = omp_get_max_threads();
+	vector<int> sum(thread, 0);
 
 int i = 0;	
 int ans = 0;
 {
 #pragma omp parallel for reduction(+:ans) // shared(sum, n) private (i, res, nQueens, a)
 	for (i = 0; i < n; ++i) {
+		int tid = omp_get_thread_num();
+
 		vector<string> nQueens(n, string(n, '.'));
 		int res = 0;
 		int* a;
@@ -83,11 +90,13 @@ int ans = 0;
 		nQueens[0][i] = 'Q';
 		find_nqueen(a, nQueens, 1, n);
 		ans += res;
-		sum[i] = res;	
+		sum[tid] += res;	
         }
 }
-	for (int i = 0; i < n; i++) {
-		cout << i << sum[i] << endl; 
+	for (int i = 0; i < thread; i++) {
+		cout << "Thread" << i << "'s work:" << sum[i] << endl;
+
+//		cout << i << sum[i] << endl; 
 	}	
 	cout << ans << endl;
 	return 0;
